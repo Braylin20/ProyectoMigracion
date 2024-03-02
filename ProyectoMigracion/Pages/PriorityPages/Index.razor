@@ -1,0 +1,99 @@
+﻿@page "/IndexPriority"
+@inject HttpClient httpClient
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3>Index</h3>
+    </div>
+    <div  class="card-body">
+        <div class="row">
+            <div class="col-3 mb-3">
+                <InputSelect class="form-select" @bind-Value="Opcion">
+                    <option value="0">Todo</option>
+                    <option value="1">PrioridadId</option>
+                    <option value="2">Descripci&oacute;n</option>
+                </InputSelect>
+            </div>
+            <div class="col-3">
+                @if(Opcion == 1)
+                {
+                    <div class="input-group">
+                        <InputNumber @bind-Value="Prioridad.PrioridadId" class="form-control" />
+                        <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                }
+                else if(Opcion ==2)
+                {
+                    <div class="input-group">
+                        <InputText @bind-Value="Prioridad.Descripcion" class="form-control" />
+                        <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary bi bi-search " @onclick="Buscar"></button>
+                }
+            </div>
+            
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>PrioridadId</th>
+                    <th>Descricpi&oacute;n</th>
+                    <th>D&iacute;as Compromiso</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in ListaPrioridades)
+                {
+                    <tr>
+                    
+                        <td>@item.PrioridadId</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.DiasCompromiso</td>
+                        <td>
+                            <a href="DeletePriority/@item.PrioridadId" class="btn btn-danger bi bi-trash-fill"></a>
+                            <a href="EditPriority/@item.PrioridadId" class="btn btn-primary bi-box-arrow-up-right"></a>
+                            <a href="DetailsPriority/@item.PrioridadId" class="btn btn-warning bi bi-info-square-fill"></a>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+@code {
+    public Prioridades Prioridad = new Prioridades();
+    public string Mensaje = string.Empty;
+    public List<Prioridades> ListaPrioridades = new List<Prioridades>();
+    public int Opcion { get; set; }
+    public int Conteo { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/prioridades"))!;
+    }
+
+    public async Task Buscar()
+    {
+        if(Opcion == 1)
+        {
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/prioridades"))!.Where(p => p.PrioridadId == Prioridad.PrioridadId).ToList();
+            StateHasChanged();
+        }
+        else if(Opcion == 2)
+        {
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/prioridades"))!.Where(p => p.Descripcion!.ToLower() == Prioridad.Descripcion!.ToLower()).ToList();
+            StateHasChanged();
+        }
+        else
+        {
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/prioridades"))!;
+            StateHasChanged();
+        }
+        Conteo = ListaPrioridades is not null ? ListaPrioridades.Count() : 0; 
+    }
+}
