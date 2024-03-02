@@ -1,0 +1,59 @@
+﻿@page "/DeleteClient/{ClienteId:int}"
+@inject HttpClient httpClient
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3 class="text-danger">¿Seguro que quieres eliminar este cliente?</h3>
+    </div>
+    <div class="card-body">
+        <p>ClienteId: @Cliente.ClienteId</p>
+        <p>Nombre: @Cliente.Nombre</p>
+        <p>Tel&eacute;fono: @Cliente.Telefono</p>
+        <p>Celular: @Cliente.Celular</p>
+        <p>RNC: @Cliente.RNC</p>
+        <p>Email: @Cliente.Email</p>
+        <p>Direcci&oacute;n: @Cliente.Direccion</p>
+
+    </div>
+    @if(Mensaje is not null)
+    {
+        <p class="text-danger">@Mensaje</p>
+    }
+    <div class="card-footer">
+        <div class="btn-group">
+            <a href="IndexClient" class="btn btn-primary bi bi-arrow-left-square-fill"> Atr&aacute;s</a>
+            <button class="btn btn-danger bi bi-trash" @onclick="Eliminar">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+
+
+@code{
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes Cliente { get; set; } = new Clientes();
+    public string Mensaje = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if(ClienteId > 0)
+        {
+            Cliente = (await httpClient.GetFromJsonAsync<Clientes>($"api/Clientes/{ClienteId}"))!;
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var response = await httpClient.DeleteAsync($"api/Clientes/{ClienteId}");
+        if(response.IsSuccessStatusCode)
+        {
+            Cliente = new Clientes();
+            Mensaje = "Registro eliminado";
+        }
+        else
+        {
+            Mensaje = "Error al eliminar el registro";
+        }
+    }
+}

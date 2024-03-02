@@ -1,0 +1,107 @@
+﻿@page "/IndexClient"
+@inject HttpClient httpClient
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3>Index</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4 mb-3">
+                <InputSelect @bind-Value="Opcion" class=" form-select ">
+                    <option value="1">ClienteId</option>
+                    <option value="2">Nombre</option>
+                    <option value="0">Todo</option>
+                </InputSelect>
+            </div>
+                <div class="col-4">
+                    @if (Opcion == 1)
+                    {
+                        <div class="input-group">
+                            <InputNumber @bind-Value="Cliente.ClienteId" class="form-control" />
+                            <button class="btn btn-primary bi bi-search" @onclick="Buscar">Buscar</button>
+                        </div>
+                    }
+                    else if (Opcion == 2)
+                    {
+                        <div class="input-group">
+                            <InputText @bind-Value="Cliente.Nombre" class="form-control" />
+                            <button class="btn btn-primary bi bi-search" @onclick="Buscar">Buscar</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary bi bi-search" @onclick="Buscar">Buscar</button>
+
+                    }
+                </div>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="CreateClient" class="btn btn-success">Crear</a>
+            </div>
+        </div>
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>ClienteID</th>
+                    <th>Nombre</th>
+                    <th>Tel&eacute;fono</th>
+                    <th>Celular</th>
+                    <th>RNC</th>
+                    <th>Email</th>
+                    <th>Direcci&oacute;n</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in ListaClientes)
+                {
+                    <tr>
+                        <td>@item.ClienteId</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Telefono</td>
+                        <td>@item.Celular</td>
+                        <td>@item.RNC</td>
+                        <td>@item.Email</td>
+                        <td>@item.Direccion</td>
+                        <td>
+                            <a href="DeleteClient/@item.ClienteId" class="btn btn-danger bi bi-trash-fill"></a>
+                            <a href="EditClient/@item.ClienteId" class="btn btn-primary bi-box-arrow-up-right"></a>
+                            <a href="DetailsClient/@item.ClienteId" class="btn btn-warning bi bi-info-square-fill"></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@code {
+    public Clientes Cliente = new Clientes();
+    public string Mensaje = string.Empty;
+    public List<Clientes> ListaClientes = new List<Clientes>();
+    public int Opcion { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes"))!;
+    }
+
+    public async Task Buscar()
+    {
+        if(Opcion == 1)
+        {
+            ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes"))!
+            .Where(c => c.ClienteId == Cliente.ClienteId)
+            .ToList();
+            StateHasChanged();
+        }else if(Opcion == 2)
+        {
+            ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes"))!
+            .Where(c => c.Nombre!.ToLower() == Cliente.Nombre!.ToLower())
+            .ToList();
+            StateHasChanged();
+        }
+        else
+        {
+            ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes"))!;
+            StateHasChanged();
+        }
+    }
+}

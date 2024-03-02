@@ -1,0 +1,94 @@
+﻿@page "/CreateClient"
+@inject HttpClient httpClient
+<EditForm Model="Cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3>Registro Clientes</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <label>ClienteId</label>
+                    <InputNumber class="form-control mb-3" @bind-Value="Cliente.ClienteId" />
+                </div>
+                <div class="col-6 mb-3 ">
+                    <label>Tel&eacute;fono </label>
+                    <InputText class="form-control" @bind-Value="Cliente.Telefono" />
+                    <ValidationMessage For="@(()=>Cliente.Telefono)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombre" />
+                    <ValidationMessage For="@(()=>Cliente.Nombre)" />
+                </div>
+                <div class="col-6 mb-3 ">
+                    <label>Celular</label>
+                    <InputText class="form-control" @bind-Value="Cliente.Celular" />
+                    <ValidationMessage For="@(()=>Cliente.Celular)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label>Direcci&oacute;n</label>
+                    <InputText class="form-control" @bind-Value="Cliente.Direccion" />
+                    <ValidationMessage For="@(()=>Cliente.Direccion)" />
+                </div>
+                <div class="col-6 mb-3 ">
+                    <label>RNC</label>
+                    <InputText class="form-control" @bind-Value="Cliente.RNC" />
+                    <ValidationMessage For="@(()=>Cliente.RNC)" />
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label>Email</label>
+                    <InputText class="form-control" @bind-Value="Cliente.Email" />
+                    <ValidationMessage For="@(()=>Cliente.Email)" />
+                </div>
+            </div>
+
+            @if (Mensaje is not null)
+            {
+                <p class="text-danger">@Mensaje</p>
+            }
+        </div>
+        <div class="card-footer">
+            <div class="btn-group">
+                <a href="/IndexClient" class="btn btn-primary bi bi-arrow-left-square-fill">Atr&aacute;s</a>
+                <button type="submit" class="btn btn-success bi-floppy-fill">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    public Clientes Cliente = new Clientes();
+    public string Mensaje = string.Empty;
+
+    public async Task Guardar()
+    {
+        var client = await httpClient.PostAsJsonAsync("api/Clientes", Cliente);
+        if (!client.IsSuccessStatusCode)
+        {
+            return;
+        }
+        var clientEncontrado = await client.Content.ReadFromJsonAsync<Clientes>();
+        if(clientEncontrado is not null)
+        {
+            Cliente = clientEncontrado;
+            Cliente = new Clientes();
+            Mensaje = "Guardado correctamente";
+            StateHasChanged();
+        }
+        else
+        {
+            Mensaje = "No se ha guardado correctamente";
+        }
+    }
+}
