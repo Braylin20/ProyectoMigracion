@@ -30,7 +30,7 @@
             </div>
             @if(Mensaje is not null)
             {
-                <p class="text-danger">@Mensaje</p>
+                <label class="text-danger">@Mensaje</label>
             }
         </div>
         <div class="card-footer">
@@ -49,22 +49,27 @@
 
     public async Task Guardar()
     {
+        var prioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/prioridades"))!;
+        if (IsEqual(prioridades))
+        {
+            Mensaje = "Ya existe una prioridad igual";
+            return;
+        }
         var response = await httpClient.PostAsJsonAsync("api/prioridades", Prioridad);
         if (!response.IsSuccessStatusCode)
         {
             return;
         }
-        var prioridadDevuelta = await response.Content.ReadFromJsonAsync<Prioridades>();
-        if(prioridadDevuelta is not null)
+        else
         {
-            Prioridad = prioridadDevuelta;
-            Prioridad = new Prioridades();
             Mensaje = "Guardado correctamente";
             StateHasChanged();
         }
-        else
-        {
-            Mensaje = "No se ha guardado correctamente";
-        }
+        
+    }
+
+    public bool IsEqual(List<Prioridades> prioridades)
+    {
+        return prioridades.Any(p => p.Descripcion!.ToLower() == Prioridad.Descripcion!.ToLower());
     }
 }
