@@ -11,7 +11,7 @@ namespace Shared.Models
         public string? Descripcion { get; set; }
         [Required(ErrorMessage = "Este campo es requerido")]
         public int DiasCompromiso { get; set; }
-        [ForeignKey("PrioridadId")]
+        [ForeignKey("PrioridadesId")]
         public ICollection<Tickets> Tickets { get; set; } = new List<Tickets>();
     }
 }

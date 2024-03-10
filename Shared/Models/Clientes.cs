@@ -30,7 +30,7 @@ namespace Shared.Models
         public string? RNC { get; set; }
         [Required(ErrorMessage = "Este campo es requerido")]
         public string? Direccion { get; set; }
-        [ForeignKey("ClienteId")]
+        [ForeignKey("ClientesId")]
         public ICollection<Tickets> Tickets { get; set; } = new List<Tickets>();
     }
 

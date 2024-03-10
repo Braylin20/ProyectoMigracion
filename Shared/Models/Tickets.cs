@@ -12,8 +12,10 @@ namespace Shared.Models
     {
         [Key]
         public int TicketId { get; set; }
-        public int ClientesId { get; set; }
-        public int PrioridadesId { get; set; }
+        [Required(ErrorMessage = "Este campo es requerido")]
+        public int? ClientesId { get; set; }
+        [Required(ErrorMessage = "Este campo es requerido")]
+        public int? PrioridadesId { get; set; }
         [Required(ErrorMessage = "Este campo es requerido")]
         public DateTime Fecha { get; set; }
         
@@ -23,5 +25,7 @@ namespace Shared.Models
         public string? Asunto { get; set; }
         [Required(ErrorMessage = "Este campo es requerido")]
         public string? Descripcion { get; set; }
+        [ForeignKey("TicketId")]
+        public ICollection<TicketDetalle> TicketDetalle { get; set; } = new List<TicketDetalle>();
     }
 }
