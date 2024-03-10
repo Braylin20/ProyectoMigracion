@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoMigracion.Api.Dal;
 
@@ -10,9 +11,11 @@ using ProyectoMigracion.Api.Dal;
 namespace ProyectoMigracion.Api.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20240303161335_TicketDetalle")]
+    partial class TicketDetalle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -106,8 +109,10 @@ namespace ProyectoMigracion.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ClientesId")
-                        .IsRequired()
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClientesId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Descripcion")
@@ -120,8 +125,7 @@ namespace ProyectoMigracion.Api.Migrations
                     b.Property<int?>("PrioridadId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("PrioridadesId")
-                        .IsRequired()
+                    b.Property<int>("PrioridadesId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SolicitadoPor")
@@ -130,7 +134,7 @@ namespace ProyectoMigracion.Api.Migrations
 
                     b.HasKey("TicketId");
 
-                    b.HasIndex("ClientesId");
+                    b.HasIndex("ClienteId");
 
                     b.HasIndex("PrioridadId");
 
@@ -150,9 +154,7 @@ namespace ProyectoMigracion.Api.Migrations
                 {
                     b.HasOne("Shared.Models.Clientes", null)
                         .WithMany("Tickets")
-                        .HasForeignKey("ClientesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClienteId");
 
                     b.HasOne("Shared.Models.Prioridades", null)
                         .WithMany("Tickets")
