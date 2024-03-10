@@ -25,7 +25,7 @@ namespace ProyectoMigracion.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Clientes>>> GetClientes()
         {
-            return await _context.Clientes.ToListAsync();
+            return await _context.Clientes.Include(c=>c.Tickets).ToListAsync();
         }
 
         // GET: api/Clientes/5

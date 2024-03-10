@@ -12,47 +12,50 @@ namespace ProyectoMigracion.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PrioridadesController : ControllerBase
+    public class TicketsController : ControllerBase
     {
         private readonly Contexto _context;
 
-        public PrioridadesController(Contexto context)
+        public TicketsController(Contexto context)
         {
             _context = context;
         }
 
-        // GET: api/Prioridades
+        // GET: api/Tickets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Prioridades>>> GetPrioridades()
+        public async Task<ActionResult<IEnumerable<Tickets>>> GetTickets()
         {
-            return await _context.Prioridades.Include(p=>p.Tickets).ToListAsync();
+
+            return await _context.Tickets.Include(t => t.TicketDetalle).ToListAsync();
         }
 
-        // GET: api/Prioridades/5
+        // GET: api/Tickets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Prioridades>> GetPrioridades(int id)
+        public async Task<ActionResult<Tickets>> GetTickets(int id)
         {
-            var prioridades = await _context.Prioridades.FindAsync(id);
+            var tickets = await _context.Tickets
+                .Include(t => t.TicketDetalle)
+                .FirstOrDefaultAsync(t=>t.TicketId == id);
 
-            if (prioridades == null)
+            if (tickets == null)
             {
                 return NotFound();
             }
 
-            return prioridades;
+            return tickets;
         }
 
-        // PUT: api/Prioridades/5
+        // PUT: api/Tickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPrioridades(int id, Prioridades prioridades)
+        public async Task<IActionResult> PutTickets(int id, Tickets tickets)
         {
-            if (id != prioridades.PrioridadId)
+            if (id != tickets.TicketId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(prioridades).State = EntityState.Modified;
+            _context.Entry(tickets).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +63,7 @@ namespace ProyectoMigracion.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PrioridadesExists(id))
+                if (!TicketsExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +76,39 @@ namespace ProyectoMigracion.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Prioridades
+        // POST: api/Tickets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Prioridades>> PostPrioridades(Prioridades prioridades)
+        public async Task<ActionResult<Tickets>> PostTickets(Tickets tickets)
         {
-            _context.Prioridades.Add(prioridades);
+            if (!TicketsExists(tickets.TicketId))
+                _context.Tickets.Add(tickets);
+            else
+                _context.Tickets.Update(tickets);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPrioridades", new { id = prioridades.PrioridadId }, prioridades);
+            return Ok(tickets);
         }
 
-        // DELETE: api/Prioridades/5
+        // DELETE: api/Tickets/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePrioridades(int id)
+        public async Task<IActionResult> DeleteTickets(int id)
         {
-            var prioridades = await _context.Prioridades.FindAsync(id);
-            if (prioridades == null)
+            var tickets = await _context.Tickets.FindAsync(id);
+            if (tickets == null)
             {
                 return NotFound();
             }
 
-            _context.Prioridades.Remove(prioridades);
+            _context.Tickets.Remove(tickets);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool PrioridadesExists(int id)
+        private bool TicketsExists(int id)
         {
-            return _context.Prioridades.Any(e => e.PrioridadId == id);
+            return _context.Tickets.Any(e => e.TicketId == id);
         }
     }
 }
