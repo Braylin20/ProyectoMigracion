@@ -54,7 +54,11 @@ namespace ProyectoMigracion.Api.Controllers
             {
                 return BadRequest();
             }
-
+            await _context.TicketsDetalle.Where(v => v.TicketId == id).ExecuteDeleteAsync();
+            foreach (var item in tickets.TicketDetalle)
+            {
+                _context.TicketsDetalle.Add(item);
+            }
             _context.Entry(tickets).State = EntityState.Modified;
 
             try
